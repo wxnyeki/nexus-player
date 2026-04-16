@@ -1,0 +1,135 @@
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter}
+
+body{
+background:#0b0b10;
+color:white;
+overflow:hidden;
+}
+
+.app{display:flex;height:100vh}
+
+.sidebar{
+width:260px;
+background:#0f0f17;
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:10px;
+border-right:1px solid #222;
+}
+
+.logo{color:#1db954}
+
+button{
+background:#1a1a24;
+border:none;
+padding:10px;
+border-radius:8px;
+color:white;
+cursor:pointer;
+}
+
+button:hover{background:#1db954}
+
+.search{display:flex;gap:5px}
+
+.search input{
+flex:1;
+padding:10px;
+border:none;
+background:#1a1a24;
+color:white;
+border-radius:8px;
+}
+
+.playlists input{
+width:100%;
+padding:8px;
+background:#1a1a24;
+border:none;
+color:white;
+border-radius:8px;
+}
+
+#playlistList li{
+list-style:none;
+padding:8px;
+margin-top:5px;
+background:#1a1a24;
+border-radius:8px;
+display:flex;
+justify-content:space-between;
+cursor:pointer;
+}
+
+.main{
+flex:1;
+padding:20px;
+overflow:auto;
+}
+
+#grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+gap:15px;
+}
+
+.card{
+background:#141421;
+padding:10px;
+border-radius:12px;
+cursor:pointer;
+transition:.2s;
+}
+
+.card:hover{transform:translateY(-6px)}
+
+.card img{width:100%;border-radius:10px}
+
+.card button{
+width:100%;
+margin-top:5px;
+background:#1db954;
+border:none;
+padding:6px;
+border-radius:6px;
+color:white;
+}
+
+.player{
+position:fixed;
+bottom:0;
+left:260px;
+right:0;
+height:80px;
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px;
+overflow:hidden;
+border-top:1px solid #222;
+background:#12121b;
+}
+
+.bg{
+position:absolute;
+inset:0;
+background-size:cover;
+background-position:center;
+filter:blur(25px);
+opacity:0.3;
+z-index:0;
+}
+
+.player img,
+.player button,
+.player input,
+.player div{
+z-index:1;
+}
+
+.player img{
+width:50px;
+height:50px;
+border-radius:10px;
+}
