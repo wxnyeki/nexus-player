@@ -31,6 +31,17 @@ let active=null
 
 let playlists=JSON.parse(localStorage.getItem("nx"))||{}
 
+createPlaylistBtn.onclick=()=>{
+const name=playlistName.value.trim()
+if(!name)return
+if(playlists[name])return
+
+playlists[name]=[]
+active=name
+playlistName.value=""
+save()
+}
+
 async function fetchSongs(q){
 const r=await fetch(`https://itunes.apple.com/search?term=${q}&entity=song&limit=25`)
 const d=await r.json()
@@ -64,51 +75,55 @@ src:t.previewUrl
 }))
 }
 
+function addToPlaylist(t){
+if(!Object.keys(playlists).length){
+const name="My Playlist"
+playlists[name]=[]
+active=name
+}
+if(!active)return
+const exists=playlists[active].some(x=>x.src===t.src)
+if(!exists){
+playlists[active].push(t)
+save()
+}
+}
+
 function render(list){
 grid.innerHTML=""
-
 list.forEach((t,i)=>{
 const c=document.createElement("div")
 c.className="card"
+c.innerHTML=` <img src="${t.cover}">
 
-c.innerHTML=`
-<img src="${t.cover}">
 <p>${t.title}</p>
 <small>${t.artist}</small>
 <button>＋</button>
 `
-
 c.onclick=()=>{
 tracks=list
 index=i
 load()
 play()
 }
-
 c.querySelector("button").onclick=e=>{
 e.stopPropagation()
-if(!active)return alert("Select playlist first")
-playlists[active].push(t)
-save()
+addToPlaylist(t)
 }
-
 grid.appendChild(c)
 })
 }
 
 function renderAlbums(list){
 grid.innerHTML=""
-
 list.forEach(a=>{
 const c=document.createElement("div")
 c.className="card"
+c.innerHTML=` <img src="${a.cover}">
 
-c.innerHTML=`
-<img src="${a.cover}">
 <p>${a.title}</p>
 <small>${a.artist}</small>
 `
-
 c.onclick=async()=>{
 const songs=await fetchAlbumTracks(a.id)
 tracks=songs
@@ -117,43 +132,6 @@ render(songs)
 load()
 play()
 }
-
-grid.appendChild(c)
-})
-}
-
-function renderSection(titleText,list){
-
-const h=document.createElement("h2")
-h.textContent=titleText
-h.style.margin="15px 0 10px"
-grid.appendChild(h)
-
-list.forEach((t,i)=>{
-const c=document.createElement("div")
-c.className="card"
-
-c.innerHTML=`
-<img src="${t.cover}">
-<p>${t.title}</p>
-<small>${t.artist}</small>
-<button>＋</button>
-`
-
-c.onclick=()=>{
-tracks=list
-index=i
-load()
-play()
-}
-
-c.querySelector("button").onclick=e=>{
-e.stopPropagation()
-if(!active)return alert("Select playlist first")
-playlists[active].push(t)
-save()
-}
-
 grid.appendChild(c)
 })
 }
@@ -170,16 +148,23 @@ src:t.previewUrl
 }
 
 async function home(){
-
-const rap=await getTracks("rap hip hop trap eminem drake kanye kendrick 50 cent pop smoke")
-const classics=await getTracks(" trending blues sam cooke")
-
+const artists=[
+"eminem",
+"pop smoke",
+"goo goo dolls",
+"sam cooke",
+"post malone",
+"the weeknd",
+"arctic monkeys"
+]
 grid.innerHTML=""
-
-renderSection("🔥 Rap Trending",rap)
-renderSection("🎼 Classics Trending",classics)
-
-tracks=rap
+let all=[]
+for(const a of artists){
+const res=await getTracks(a)
+all=all.concat(res.slice(0,5))
+}
+render(all)
+tracks=all
 index=0
 load()
 }
@@ -187,7 +172,6 @@ load()
 function load(){
 const t=tracks[index]
 if(!t)return
-
 audio.src=t.src
 cover.src=t.cover
 song.textContent=t.title
@@ -226,9 +210,8 @@ play()
 volume.oninput=e=>audio.volume=e.target.value
 
 addNow.onclick=()=>{
-if(!active)return alert("Select playlist first")
-playlists[active].push(tracks[index])
-save()
+if(!tracks.length)return
+addToPlaylist(tracks[index])
 }
 
 function save(){
@@ -238,11 +221,9 @@ renderPlaylists()
 
 function renderPlaylists(){
 playlistList.innerHTML=""
-
 Object.keys(playlists).forEach(n=>{
 const li=document.createElement("li")
 li.innerHTML=`<span>${n}</span><span>✖</span>`
-
 li.onclick=()=>{
 active=n
 tracks=playlists[n]
@@ -250,13 +231,11 @@ index=0
 render(tracks)
 load()
 }
-
 li.children[1].onclick=e=>{
 e.stopPropagation()
 delete playlists[n]
 save()
 }
-
 playlistList.appendChild(li)
 })
 }
